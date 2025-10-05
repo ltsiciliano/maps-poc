@@ -1,68 +1,68 @@
 # maps-poc
 
-PoC (proof of concept) de uma API Spring Boot para integração com o Google Maps (Geocoding, Reverse Geocoding e Places Autocomplete).
+Proof of Concept (PoC) Spring Boot API for integrating with Google Maps (Geocoding, Reverse Geocoding, and Places Autocomplete).
 
-Tudo já está configurado para você apenas informar a sua API Key do Google Maps. Incluímos também:
-- Swagger/OpenAPI (springdoc) com UI em `/swagger-ui.html`
+Everything is already configured so you only need to provide your Google Maps API Key. We also include:
+- Swagger/OpenAPI (springdoc) with UI at `/swagger-ui.html`
 - Actuator (health/info)
-- Devtools (hot reload em desenvolvimento)
-- Camadas Controller + Service
-- GlobalExceptionHandler com `@RestControllerAdvice` para padronizar respostas de erro (400/500)
-- Lombok para reduzir boilerplate (construtores, getters/setters)
-- Testes (unitários e web) com Spring Boot Test e MockMvc
-- JaCoCo para relatório de cobertura de testes
-- Especificações OpenAPI (YAML) não oficiais para os endpoints do Google usados (para futura geração de cliente, se desejar)
+- Devtools (hot reload for development)
+- Controller + Service layers
+- GlobalExceptionHandler with `@RestControllerAdvice` to standardize error responses (400/500)
+- Lombok to reduce boilerplate (constructors, getters/setters)
+- Tests (unit and web) with Spring Boot Test and MockMvc
+- JaCoCo for test coverage reports
+- Unofficial OpenAPI (YAML) specs for the Google endpoints used (for potential client generation)
 
-## Requisitos
+## Requirements
 - Java 17+
 - Maven 3.9+
-- Uma API Key válida do Google Maps Platform com os serviços habilitados (Geocoding API e Places API)
+- A valid Google Maps Platform API Key with the necessary services enabled (Geocoding API and Places API)
 
-## Configuração da API Key
-Defina a variável de ambiente `GOOGLE_MAPS_API_KEY` antes de iniciar a aplicação:
+## API Key configuration
+Set the environment variable `GOOGLE_MAPS_API_KEY` before starting the application:
 
 ```bash
-export GOOGLE_MAPS_API_KEY="SUA_API_KEY_AQUI"
+export GOOGLE_MAPS_API_KEY="YOUR_API_KEY_HERE"
 ```
 
-Alternativamente, você pode criar um `application-local.yml` (não versionado) e configurar:
+Alternatively, you can create a non-versioned `application-local.yml` and configure:
 
 ```yaml
 google:
   maps:
-    api-key: SUA_API_KEY_AQUI
+    api-key: YOUR_API_KEY_HERE
 ```
 
-> Observação: por padrão, a aplicação lê `google.maps.api-key` e/ou a variável de ambiente `GOOGLE_MAPS_API_KEY`.
+> Note: by default, the application reads `google.maps.api-key` and/or the `GOOGLE_MAPS_API_KEY` environment variable.
 
-## Como executar
+## How to run
 
 ```bash
-# compila e executa
+# build and run
 mvn spring-boot:run
 
-# ou empacota e executa
+# or package and run
 mvn clean package
 java -jar target/maps-poc-0.0.1-SNAPSHOT.jar
 ```
 
-Aplicação iniciará em `http://localhost:8080`.
+The application will start at `http://localhost:8080`.
 
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - OpenAPI JSON: http://localhost:8080/v3/api-docs
 - Actuator: http://localhost:8080/actuator (health, info)
 
-## Endpoints disponíveis
+## Available endpoints
 
 Base path: `/api/maps`
 
-- `GET /api/maps/geocode?address=...&language=pt-BR` — Geocodifica um endereço (chama Google Geocoding API)
-- `GET /api/maps/reverse?lat=-23.5&lng=-46.6&language=pt-BR` — Reverse geocoding por coordenadas (chama Google Geocoding API)
-- `GET /api/maps/places/autocomplete?input=Avenida%20Paulista&language=pt-BR` — Autocomplete de lugares (chama Google Places Autocomplete)
+- `GET /api/maps/geocode?address=...&language=pt-BR` — Geocode an address (calls Google Geocoding API)
+- `GET /api/maps/reverse?lat=-23.5&lng=-46.6&language=pt-BR` — Reverse geocoding by coordinates (calls Google Geocoding API)
+- `GET /api/maps/places/autocomplete?input=Avenida%20Paulista&language=pt-BR` — Places Autocomplete (calls Google Places Autocomplete)
 
-As respostas retornam o JSON bruto recebido do Google (mesma estrutura do Google), para simplicidade neste PoC.
+Responses return the raw JSON received from Google (same structure as Google) for simplicity in this PoC.
 
-### Exemplos cURL
+### cURL examples
 
 ```bash
 curl "http://localhost:8080/api/maps/geocode?address=Avenida%20Paulista%2C%20S%C3%A3o%20Paulo&language=pt-BR"
@@ -72,69 +72,69 @@ curl "http://localhost:8080/api/maps/reverse?lat=-23.561414&lng=-46.656532&langu
 curl "http://localhost:8080/api/maps/places/autocomplete?input=Avenida%20Paulista&language=pt-BR"
 ```
 
-## Estrutura principal
+## Main structure
 
 ```
 src/main/java/com/example/mapspoc
 ├── MapsPocApplication.java
 ├── config
-│   ├── GoogleMapsProperties.java  # lê google.maps.api-key
+│   ├── GoogleMapsProperties.java  # reads google.maps.api-key
 │   └── HttpClientConfig.java      # RestTemplate
 ├── controller
-│   └── GoogleMapsController.java  # camada de exposição (Swagger anotado)
+│   └── GoogleMapsController.java  # exposure layer (Swagger annotated)
 ├── service
-│   └── GoogleMapsService.java     # integra com Google Maps via REST
+│   └── GoogleMapsService.java     # integrates with Google Maps via REST
 └── exception
     └── GlobalExceptionHandler.java
 
 src/main/resources
 ├── application.yml
 └── openapi/google
-    ├── geocoding.yaml             # Spec não-oficial do endpoint de geocoding
-    └── places-autocomplete.yaml   # Spec não-oficial do endpoint de places autocomplete
+    ├── geocoding.yaml             # Unofficial spec for geocoding endpoint
+    └── places-autocomplete.yaml   # Unofficial spec for places autocomplete endpoint
 ```
 
-## OpenAPI (YAML) do Google
+## Google OpenAPI (YAML)
 
-O diretório `src/main/resources/openapi/google` contém especificações OpenAPI (não oficiais) mínimas dos endpoints do Google utilizados por esta POC. Você pode usá-las para gerar um cliente HTTP tipado caso queira.
+The directory `src/main/resources/openapi/google` contains minimal (unofficial) OpenAPI specifications for the Google endpoints used by this PoC. You can use them to generate a typed HTTP client if you wish.
 
-Já deixamos um plugin do `openapi-generator-maven-plugin` configurado no `pom.xml` (apontando para `geocoding.yaml`). Ele está marcado para rodar na fase `generate-sources`. Se preferir desabilitar, use o profile `no-openapi-gen`.
+We have already set up an `openapi-generator-maven-plugin` entry in `pom.xml` (pointing to `geocoding.yaml`). It is configured to run in the `generate-sources` phase. If you prefer to disable it, use the `no-openapi-gen` profile.
 
-### Gerar cliente a partir do YAML (opcional)
+### Generate client from YAML (optional)
 
 ```bash
-# gera códigos do cliente para o geocoding (saída em target/generated-sources/openapi-geocoding)
+# generates client code for geocoding (output in target/generated-sources/openapi-geocoding)
 mvn generate-sources
 ```
 
-Depois você poderia apontar seu serviço para esse cliente gerado ao invés do `RestTemplate` manual (este PoC mantém simples com RestTemplate).
+You could then point your service to that generated client instead of the manual `RestTemplate` (this PoC keeps it simple with RestTemplate).
 
-## Testes
+## Tests
 
-Execute a suíte de testes:
+Run the test suite:
 
 ```bash
 mvn test
 ```
 
-### Cobertura de Código (JaCoCo)
+### Code Coverage (JaCoCo)
 
-O plugin JaCoCo já está configurado no `pom.xml`. Para gerar o relatório de cobertura:
+The JaCoCo plugin is already configured in `pom.xml`. To generate the coverage report:
 
 ```bash
 mvn clean verify
 ```
 
-Depois abra o relatório em:
+Then open the report at:
 
 - `target/site/jacoco/index.html`
 
-## Observações
-- Não há segurança configurada neste momento (conforme solicitado).
-- Certifique-se de habilitar os serviços necessários (Geocoding API, Places API) na sua conta do Google Cloud e de restringir apropriadamente sua API Key.
-- Erros comuns retornarão com um payload JSON padrão via nosso `GlobalExceptionHandler`.
-- Caso use uma IDE, ative o processamento de anotações (annotation processing) para o Lombok.
+## Notes
+- There is no security configured at this time (as requested).
+- Make sure to enable the required services (Geocoding API, Places API) in your Google Cloud account and to properly restrict your API Key.
+- Common errors will return a standardized JSON payload via our `GlobalExceptionHandler`.
+- If you use an IDE, enable annotation processing for Lombok.
 
-## Versionamento
+## Versioning
 
-O projeto foi preparado para o repositório GitHub sugerido: `https://github.com/ltsiciliano/maps-poc.git`. Você pode realizar o push a partir do seu ambiente.
+The project has been prepared for the suggested GitHub repository: `https://github.com/ltsiciliano/maps-poc.git`. You can push from your environment.
