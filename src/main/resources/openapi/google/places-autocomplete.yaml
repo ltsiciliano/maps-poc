@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Google Places Autocomplete API (Unofficial Spec)
+  version: 1.0.0
+  description: Minimal OpenAPI spec for Places Autocomplete endpoint used by this app.
+servers:
+  - url: https://maps.googleapis.com/maps/api
+paths:
+  /place/autocomplete/json:
+    get:
+      summary: Places Autocomplete
+      parameters:
+        - in: query
+          name: input
+          schema:
+            type: string
+          required: true
+          description: The text string on which to search.
+        - in: query
+          name: language
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: key
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  predictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        description:
+                          type: string
+                        place_id:
+                          type: string
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: query
+      name: key
+security:
+  - apiKey: []

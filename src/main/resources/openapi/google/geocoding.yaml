@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: Google Maps Geocoding API (Unofficial Spec)
+  version: 1.0.0
+  description: |
+    Minimal OpenAPI spec for Google Maps Geocoding API endpoints used by this app.
+    This is a community-provided approximation for convenience and is not an official Google spec.
+servers:
+  - url: https://maps.googleapis.com/maps/api
+    description: Google Maps API base URL
+paths:
+  /geocode/json:
+    get:
+      summary: Geocoding
+      description: Geocode a textual address or reverse geocode lat/lng.
+      parameters:
+        - in: query
+          name: address
+          schema:
+            type: string
+          required: false
+          description: The street address that you want to geocode.
+        - in: query
+          name: latlng
+          schema:
+            type: string
+            example: "-23.561414,-46.656532"
+          required: false
+          description: The latitude/longitude value to reverse geocode.
+        - in: query
+          name: language
+          schema:
+            type: string
+            example: pt-BR
+          required: false
+        - in: query
+          name: key
+          schema:
+            type: string
+          required: true
+          description: Your Google Maps API key
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        formatted_address:
+                          type: string
+                        geometry:
+                          type: object
+                          properties:
+                            location:
+                              type: object
+                              properties:
+                                lat:
+                                  type: number
+                                  format: double
+                                lng:
+                                  type: number
+                                  format: double
+                        place_id:
+                          type: string
+        '400':
+          description: Bad Request
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: query
+      name: key
+security:
+  - apiKey: []

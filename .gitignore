@@ -1,0 +1,20 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Local config overrides
+application-local.yml
